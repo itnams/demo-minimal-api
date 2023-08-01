@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "DKPTUZ3mPOOGZnYtRXmbeWzZ1AwR6I/kpMCFBIv2W5k=",
+  "Source": "demo-minimal-api",
+  "BasePath": "_content/demo-minimal-api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
