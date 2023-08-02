@@ -16,11 +16,9 @@ var configBuilder = builder.Configuration
         .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", EnvironmentVariableTarget.Process)}.json", optional: true);
 
 var app = builder.Build();
-var connectionString = "Server=localhost;Initial Catalog=msdb;Persist Security Info=False;User ID=sa;Password=dev_2020!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;";
-using var connection = new SqlConnection(connectionString);
 IConfigurationRoot config = configBuilder.Build();
+using var connection = new SqlConnection(config.GetConnectionString("PgSql"));
 var services = builder.Services;
-
 services.AddDbContext<MsSqlDbContext>(options => options.UseSqlServer(""));
 services.AddDbContext<PgDbContext>(options => options.UseNpgsql(config.GetConnectionString("PgSql")));
 
