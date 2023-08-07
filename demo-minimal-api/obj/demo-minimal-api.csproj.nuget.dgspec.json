@@ -1,32 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "D:\\code\\demo-minimal-api\\demo-minimal-api\\demo-minimal-api.csproj": {}
+    "/Users/nguyennam/Documents/code/demo-minimal-api/demo-minimal-api/demo-minimal-api.csproj": {}
   },
   "projects": {
-    "D:\\code\\demo-minimal-api\\demo-minimal-api\\demo-minimal-api.csproj": {
+    "/Users/nguyennam/Documents/code/demo-minimal-api/demo-minimal-api/demo-minimal-api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\code\\demo-minimal-api\\demo-minimal-api\\demo-minimal-api.csproj",
+        "projectUniqueName": "/Users/nguyennam/Documents/code/demo-minimal-api/demo-minimal-api/demo-minimal-api.csproj",
         "projectName": "demo-minimal-api",
-        "projectPath": "D:\\code\\demo-minimal-api\\demo-minimal-api\\demo-minimal-api.csproj",
-        "packagesPath": "C:\\Users\\itnam\\.nuget\\packages\\",
-        "outputPath": "D:\\code\\demo-minimal-api\\demo-minimal-api\\obj\\",
+        "projectPath": "/Users/nguyennam/Documents/code/demo-minimal-api/demo-minimal-api/demo-minimal-api.csproj",
+        "packagesPath": "/Users/nguyennam/.nuget/packages/",
+        "outputPath": "/Users/nguyennam/Documents/code/demo-minimal-api/demo-minimal-api/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\itnam\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/nguyennam/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\sdk\\7.0.306\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
+          "/usr/local/share/dotnet/sdk/7.0.306/Sdks/Microsoft.NET.Sdk.Web/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -48,6 +42,10 @@
             "Dapper": {
               "target": "Package",
               "version": "[2.0.143, )"
+            },
+            "FluentValidation": {
+              "target": "Package",
+              "version": "[11.6.0, )"
             },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
@@ -97,7 +95,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.306/RuntimeIdentifierGraph.json"
         }
       }
     }

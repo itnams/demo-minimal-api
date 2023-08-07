@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace demo_minimal_api
 {
-	public class UpsertArticletCommand
+	public class UpsertArticleCommand
 	{
         public string Title { get; set; }
         public string Url { get; set; }
@@ -10,5 +12,6 @@ namespace demo_minimal_api
         public string CreatedBy { get; set; }
         public string UpdatedDate { get; set; }
     }
+
 }
 

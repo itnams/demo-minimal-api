@@ -1,15 +1,26 @@
 ﻿using Dapper;
 using demo_minimal_api;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+var configBuilder = builder.Configuration
+        .SetBasePath(builder.Environment.ContentRootPath)
+        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", EnvironmentVariableTarget.Process)}.json", optional: true);
+IConfigurationRoot config = configBuilder.Build();
+var services = builder.Services;
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
+services.AddDbContext<MsSqlDbContext>(options => options.UseSqlServer(config.GetConnectionString("MsSql")));
+services.AddDbContext<PgDbContext>(options => options.UseNpgsql(config.GetConnectionString("PgSql")));
+
+if (config.GetValue<string>("DbProvider") == "Ms")
+    services.AddScoped<IAppDbContext>(provider => provider.GetService<MsSqlDbContext>());
+else
+    services.AddScoped<IAppDbContext>(provider => provider.GetService<PgDbContext>());
 
 var app = builder.Build();
 
@@ -22,7 +33,7 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-using var connection = new SqlConnection("Server=localhost;Initial Catalog=msdb;Persist Security Info=False;User ID=sa;Password=dev_2020!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
+using var connection = new SqlConnection(config.GetConnectionString("MsSql"));
 
 
 app.MapGet("/articles", async (int? pageSize, int? pageIndex) =>
@@ -51,7 +62,7 @@ app.MapGet("/articles/{id}", async (int id) =>
 .WithName("DetailArticle")
 .WithOpenApi();
 
-app.MapPost("/articles/add", async (UpsertArticletCommand data) =>
+app.MapPost("/articles/add", async (UpsertArticleCommand data) =>
 {
     string Sql = "INSERT INTO Article values (@Title,@Url,@Content,@CreatedDate,@CreatedBy,@UpdatedDate);";
     var result = connection.ExecuteScalar(Sql, data);
@@ -59,11 +70,20 @@ app.MapPost("/articles/add", async (UpsertArticletCommand data) =>
 }).WithName("AddArticle")
 .WithOpenApi();
 
-app.MapPut("/articles/{id}", async (UpsertArticletCommand data, int id) =>
+app.MapPut("/articles/{id}", async (UpsertArticleCommand data, int id) =>
 {
     string Sql = $"UPDATE Article SET Title=@Title,Url=@Url,Content=@Content,CreatedDate=@CreatedDate,CreatedBy=@CreatedBy,UpdatedDate=@UpdatedDate WHERE Id = " + id;
-    var result = connection.Execute(Sql, data);
-    return Results.Ok(result);
+    var validator = new UpsertArticleCommandValidation();
+    var validationResult = validator.Validate(data);
+    if (validationResult.IsValid)
+    {
+        var result = connection.Execute(Sql, data);
+        return Results.Ok(result);
+    }
+    else
+    {
+        return Results.BadRequest(validationResult.Errors);
+    }
 }).WithName("UpdateArticle")
 .WithOpenApi();
 
