@@ -24,7 +24,7 @@ namespace demo_minimal_api
         }
         private bool ValidDateFormat(string dateString)
         {
-            return DateTime.TryParseExact(dateString, "yyyy-MM-ddThh:", null, System.Globalization.DateTimeStyles.None, out _);
+            return DateTime.TryParseExact(dateString, "yyyy-MM-ddThh:mm", null, System.Globalization.DateTimeStyles.None, out _);
         }
     }
 }
