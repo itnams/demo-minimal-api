@@ -3,58 +3,44 @@ using demo_minimal_api;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-var configBuilder = builder.Configuration
-        .SetBasePath(builder.Environment.ContentRootPath)
-        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", EnvironmentVariableTarget.Process)}.json", optional: true);
 
 var app = builder.Build();
-IConfigurationRoot config = configBuilder.Build();
-using var connection = new SqlConnection(config.GetConnectionString("PgSql"));
-var services = builder.Services;
-services.AddDbContext<MsSqlDbContext>(options => options.UseSqlServer(""));
-services.AddDbContext<PgDbContext>(options => options.UseNpgsql(config.GetConnectionString("PgSql")));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-if (config.GetValue<string>("DbProvider") == "Ms")
-    services.AddScoped<IAppDbContext>(provider => provider.GetService<MsSqlDbContext>());
-else
-    services.AddScoped<IAppDbContext>(provider => provider.GetService<PgDbContext>());
 
-app.MapGet("/articles", ([FromServices] IAppDbContext context) => context.Articles.ToList())
+using var connection = new SqlConnection("Server=localhost;Initial Catalog=msdb;Persist Security Info=False;User ID=sa;Password=dev_2020!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
+
+
+app.MapGet("/articles", async (int? pageSize, int? pageIndex) =>
+{
+    if (pageSize is null)
+    {
+        pageSize = 10;
+    }
+
+    if (pageIndex is null)
+    {
+        pageIndex = 0;
+    }
+    var listArticle = connection.Query<Article>(@"SELECT* FROM Article ORDER BY Id OFFSET " + pageIndex + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY;");
+    return Results.Ok(listArticle);
+})
 .WithName("ListArticle")
 .WithOpenApi();
-
-//app.MapGet("/articles", async (int? pageSize, int? pageIndex) =>
-//{
-//    if (pageSize is null)
-//    {
-//        pageSize = 10;
-//    }
-
-//    if (pageIndex is null)
-//    {
-//        pageIndex = 0;
-//    }
-//    var listArticle = connection.Query<Article>(@"SELECT* FROM Article ORDER BY Id OFFSET " + pageIndex + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY;");
-//    return Results.Ok(listArticle);
-//})
-//.WithName("ListArticle")
-//.WithOpenApi();
 
 app.MapGet("/articles/{id}", async (int id) =>
 {
@@ -89,3 +75,8 @@ app.MapDelete("/articles/{id}", async (int id) =>
 }).WithName("DeleteArticle")
 .WithOpenApi();
 app.Run();
+
+internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+{
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
